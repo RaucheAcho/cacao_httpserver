@@ -1,4 +1,6 @@
 use std::io::Read;
+use crate::http::Request;
+use std::convert::TryFrom;
 use std::net::TcpListener;
 
 pub struct Server{
@@ -20,7 +22,13 @@ impl Server{
                    let mut buffer = [0; 1024];
                    match stream.read(&mut buffer){
                        Ok(_)=>{
-                           println!("la requête est accepté: {}", String::from_utf8_lossy(&buffer))
+                           println!("la requête est accepté: {}", String::from_utf8_lossy(&buffer));
+
+                           match Request::try_from(&buffer[..]){// oubien as &[u8]
+                             Ok(requset) =>{},
+                             Err(e) => println!("Erreur dans la conversion de la requête {}", e)
+                           } 
+                           
                        },
                        Err(e) =>{
                            println!("la connexion na pas pus être établit {}", e)
@@ -29,7 +37,6 @@ impl Server{
                },
                Err(e) =>{println!("{}", e)}
            }
-            
        }
     }
 }
